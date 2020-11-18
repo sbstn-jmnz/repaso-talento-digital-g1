@@ -1,4 +1,17 @@
-const peopleForm = (function () { 
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+  }
+
+String.prototype.titleize = function() {
+  var string_array = this.split(' ');
+  string_array = string_array.map(function(str) {
+     return str.toLowerCase().capitalize(); 
+  });
+  
+  return string_array.join(' ');  
+}
+
+const peopleForm = (function () {
 
   const state = {}
   state.people = []
@@ -53,7 +66,7 @@ const peopleForm = (function () {
     };
 
     if(validate(personName)){
-      state.people.push(personName)
+      state.people.push(personName.titleize())
       render()
     }else{
       alert(state.errors.join(' '))
@@ -71,7 +84,7 @@ const peopleForm = (function () {
   }
 
   function validatesUniqueness(str){
-    if(!state.people.some(person => person == str)){
+    if(!state.people.some(person => person.toLowerCase() == str.toLowerCase())){
       return true
     }else{
       state.errors.push('Ese nombre ya existe.')
