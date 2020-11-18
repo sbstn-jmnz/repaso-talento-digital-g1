@@ -2,10 +2,11 @@ const peopleForm = (function () {
 
   const state = {}
   state.people = []
+  state.errors = []
 
-  const inputBtn  =  document.querySelector('button[type="submit"]')
-  const nameInput = document.querySelector('input[type="text"]')
   const peopleList = document.querySelector('div.results')
+  const nameInput = document.querySelector('input[type="text"]')
+  const inputBtn  =  document.querySelector('button[type="submit"]')
 
   inputBtn.addEventListener('click', addPerson)
   peopleList.addEventListener('click', removePerson)
@@ -43,15 +44,58 @@ const peopleForm = (function () {
     }
   }
 
-  function addPerson(e){
-  // TODO: Agregar validaciones: Campo nombre no nulo, y mínimo 2 carácteres
+  function addPerson(e){  
     let personName = e
+    
     if(typeof(e)=='object'){ 
       e.preventDefault() 
       personName = nameInput.value
-      };
-    state.people.push(personName)
-    render()
+    };
+
+    if(validate(personName)){
+      state.people.push(personName)
+      render()
+    }else{
+      alert(state.errors.join(' '))
+    }
+     nameInput.value = ''
+  }
+
+  function validate(personName){
+    state.errors = []
+    const v1 = validatesOnlyChars(personName)
+    const v2 = validatesUniqueness(personName)
+    const v3 = validatesNotNull(personName)
+
+    return (v1 && v2 && v3)
+  }
+
+  function validatesUniqueness(str){
+    if(!state.people.some(person => person == str)){
+      return true
+    }else{
+      state.errors.push('Ese nombre ya existe.')
+      return false
+    }
+  }
+
+  function validatesNotNull(str){
+    if(str == '' || str == null){
+      state.errors.push('El nombre no puede ser vacío.')
+      return false
+    }
+    return true
+  }
+
+  function validatesOnlyChars(str){
+    let regex = /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/g;
+
+    if(regex.test(str)){
+      return true
+    } else{
+      state.errors.push('El nombre contiene caractéres inválidos.')
+      return false
+    }
   }
 
   function render(){
